@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI playerLifeText;
     public TextMeshProUGUI gameoverText;
+    public GameObject hello;
     public TextMeshProUGUI countDown;
     public Button restartButton;
     public PlayerController _controlPlayer;
