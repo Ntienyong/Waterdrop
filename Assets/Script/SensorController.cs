@@ -16,4 +16,12 @@ public class SensorController : MonoBehaviour
         
     }
 
+    void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.CompareTag("Top Sensor"))
+        {
+            Destroy(this.gameObject);
+        }
+    }
+
 }

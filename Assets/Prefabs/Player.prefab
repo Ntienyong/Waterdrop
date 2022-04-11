@@ -109,6 +109,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   playerLife: 4
+  hasShield: 0
+  shieldIndicator: {fileID: 5045922121778889673, guid: 38ea7705369e9be4b93358a99e7add28,
+    type: 3}
 --- !u!54 &8962480585107502566
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -124,4 +127,4 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1

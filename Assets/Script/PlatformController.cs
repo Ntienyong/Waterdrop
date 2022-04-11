@@ -5,8 +5,6 @@ using UnityEngine;
 public class PlatformController : MonoBehaviour
 {
     public int moveSpeed;
-    public bool isPlayerAlive;
-
     private float _yDestroyBound = 6.0f;
 
     // Start is called before the first frame update

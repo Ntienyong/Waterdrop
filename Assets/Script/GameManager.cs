@@ -7,7 +7,9 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public GameObject[] platforms;
+    public GameObject[] powerup;
     public GameObject player;
+    public GameObject[] coins;
     public Transform platformParent;
     private Vector3 _playerStartPos;
     private Vector3 _spawnPos;
@@ -17,7 +19,6 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI playerLifeText;
     public TextMeshProUGUI gameoverText;
-    public GameObject hello;
     public TextMeshProUGUI countDown;
     public Button restartButton;
     public PlayerController _controlPlayer;
@@ -51,12 +52,14 @@ public class GameManager : MonoBehaviour
         gameActive = true;
         StartCoroutine(StartGametimer());
         StartGameMechanics();
+        StartCoroutine(CalculateSpawnPos());
     }
 
     // Update is called once per frame
     void Update()
     {
         _reSpawnPos = platformParent.GetChild(2).transform.position;
+        Vector3 _powerupSpawnPos = platformParent.GetChild(0).transform.position;
         
         PauseGame();
     }
@@ -75,17 +78,24 @@ public class GameManager : MonoBehaviour
             }
 
         }
-        InvokeRepeating("SpawnPlatforms", _startSpawnTime, _contSpawnTime);
-        StartCoroutine("SpawnBadPlatforms");
+
         Instantiate(player, _playerStartPos, transform.rotation);
-        Debug.Log("Player spawn");
+        InvokeRepeating("SpawnPlatforms", _startSpawnTime, _contSpawnTime);
+    }
+
+    public IEnumerator CalculateSpawnPos()
+    {
+        _spawnPos = new Vector3(Random.Range(-_xSpawnPosRange, _xSpawnPosRange), -_ySpawnPos, 0);
+        yield return new WaitForSeconds(1.0f);
+        StartCoroutine(CalculateSpawnPos());
+
     }
 
     void SpawnPlatforms()
     {
         if (startGame == true)
         {
-            _spawnPos = new Vector3(Random.Range(-_xSpawnPosRange, _xSpawnPosRange), -_ySpawnPos, 0);
+            //_spawnPos = new Vector3(Random.Range(-_xSpawnPosRange, _xSpawnPosRange), -_ySpawnPos, 0);
 
             Instantiate(platforms[0], _spawnPos, platforms[0].transform.rotation, platformParent);
         }
@@ -93,10 +103,29 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator SpawnBadPlatforms()
     {
-        _spawnPos = new Vector3(Random.Range(-_xSpawnPosRange, _xSpawnPosRange), -_ySpawnPos, 0);
-        Instantiate(platforms[1], _spawnPos, platforms[1].transform.rotation);
+        //_spawnPos = new Vector3(Random.Range(-_xSpawnPosRange, _xSpawnPosRange), -_ySpawnPos, 0);
         yield return new WaitForSeconds(Random.Range(2.0f, 15.0f));
+        Instantiate(platforms[1], _spawnPos, platforms[1].transform.rotation);
         StartCoroutine("SpawnBadPlatforms");
+    }
+
+    public IEnumerator SpawnPowerup()
+    {
+        int powerupIndex = Random.Range(0, powerup.Length);
+        yield return new WaitForSeconds(10.0f);
+        Instantiate(powerup[powerupIndex], _spawnPos + new Vector3(0, 1.0f, 0), transform.rotation);
+        StartCoroutine(SpawnPowerup());
+    }
+
+    public IEnumerator SpawnCoins()
+    {
+        int coinsIndex = Random.Range(0, coins.Length);
+        while(true)
+        {
+            yield return new WaitForSeconds (Random.Range(5.0f, 15.0f));
+            Instantiate(coins[coinsIndex], _spawnPos + new Vector3(Random.Range(-_xSpawnPosRange, _xSpawnPosRange), 0, 0), transform.rotation);
+        }
+        
     }
 
     public IEnumerator StartGametimer()
@@ -111,6 +140,10 @@ public class GameManager : MonoBehaviour
                 countDown.gameObject.SetActive(false);
                 startGame = true;
                 StartCoroutine(CountScore());
+                StartCoroutine(GameSpeedController());
+                StartCoroutine(SpawnCoins());
+                StartCoroutine("SpawnBadPlatforms");
+                StartCoroutine(SpawnPowerup());
             }
         }
     }
@@ -120,22 +153,50 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(0.05f);
         score++;
         scoreText.text = "Score: " + score;
-
-        if(score > 1000 && !gameover)
-        {
-            Time.timeScale = 1.2f;
-        }
-
-        if(score > 2000 && !gameover)
-        {
-            Time.timeScale = 1.5f;
-        }
-
-        if(score > 3000 && !gameover)
-        {
-            Time.timeScale = 2.0f;
-        }
         StartCoroutine(CountScore());
+    }
+
+    public IEnumerator GameSpeedController()
+    {
+        int gameTime = 0;
+        while(true)
+        {
+            yield return new WaitForSeconds(1.0f);
+            gameTime++;
+
+            if(gameTime >= 60 && !gameover)
+            {
+                Time.timeScale = 1.1f;
+            }
+            if(gameTime >= 120 && !gameover)
+            {
+                Time.timeScale = 1.2f;
+            }
+            if(gameTime >= 180 && !gameover)
+            {
+                Time.timeScale = 1.3f;
+            }
+            if(gameTime >= 240 && !gameover)
+            {
+                Time.timeScale = 1.4f;
+            }
+            if(gameTime >= 300 && !gameover)
+            {
+                Time.timeScale = 1.5f;
+            }
+            if(gameTime >= 360 && !gameover)
+            {
+                Time.timeScale = 1.6f;
+            }
+            if(gameTime >= 420 && !gameover)
+            {
+                Time.timeScale = 1.7f;
+            }
+            if(gameTime >= 580 && !gameover)
+            {
+                Time.timeScale = 1.8f;
+            }
+        }
     }
 
     public void GameOver()
@@ -149,23 +210,37 @@ public class GameManager : MonoBehaviour
     public void RestartGame()
     {
         SceneManager.LoadScene("Waterdrop");
-        // Application.LoadLevel("Waterdrop");
     }
 
     void PauseGame()
     {
         if(Input.GetKeyDown(KeyCode.Space) && gameActive)
         {
-            Debug.Log("Paused game");
             Time.timeScale = 0;
             gameActive = false;
         }
 
         else if(Input.GetKeyDown(KeyCode.Space) && !gameActive)
         {
-            Debug.Log("Unpaused game");
             Time.timeScale = 1;
             gameActive = true;
         }
+    }
+
+    public IEnumerator ScoreXPU()
+    {
+        int secondsToWait = 15;
+        while(secondsToWait > 0)
+        {
+            score += 100;
+            yield return new WaitForSeconds(1.0f);
+            secondsToWait--;
+
+            if(secondsToWait == 0)
+            {
+                break;
+            }
+        }
+            
     }
 }

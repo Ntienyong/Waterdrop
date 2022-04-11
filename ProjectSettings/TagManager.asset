@@ -5,6 +5,16 @@ TagManager:
   serializedVersion: 2
   tags:
   - GoodPlat
+  - BadPlat
+  - Sensor
+  - ExtraLife
+  - Magnet PU
+  - ScoreX PU
+  - Shield PU
+  - Coin
+  - Top Sensor
+  - Low Sensor
+  - Shield Prefab
   layers:
   - Default
   - TransparentFX
